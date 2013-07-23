@@ -3,6 +3,7 @@ abstract: 'write syntax extensions in perl'
 author:
   - 'Jesse Luehrs <doy@tozt.net>'
 build_requires:
+  B::Hooks::EndOfScope: 0
   Carp: 0
   Exporter: 0
   File::Find: 0
@@ -29,7 +30,7 @@ resources:
   bugtracker: https://github.com/doy/parse-keyword/issues
   homepage: http://metacpan.org/release/Parse-Keyword
   repository: git://github.com/doy/parse-keyword.git
-version: 0.01
+version: 0.02
 x_Dist_Zilla:
   perl:
     version: 5.018000

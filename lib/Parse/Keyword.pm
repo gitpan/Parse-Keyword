@@ -3,7 +3,7 @@ BEGIN {
   $Parse::Keyword::AUTHORITY = 'cpan:DOY';
 }
 {
-  $Parse::Keyword::VERSION = '0.01';
+  $Parse::Keyword::VERSION = '0.02';
 }
 use strict;
 use warnings;
@@ -69,11 +69,13 @@ Parse::Keyword - write syntax extensions in perl
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
   use Parse::Keyword { try => \&try_parser };
+  use Exporter 'import';
+  our @EXPORT = 'try';
 
   sub try {
       my ($try, $catch) = @_;
@@ -98,6 +100,9 @@ version 0.01
   }
 
 =head1 DESCRIPTION
+
+B<< NOTE: The API of this module is still in flux. I may make
+backwards-incompatible changes as I figure out how it should look. >>
 
 This module allows you to write keyword-based syntax extensions without
 requiring you to write any C code yourself. It is similar to L<Devel::Declare>,
@@ -132,6 +137,12 @@ current position in the buffer to be parsed is not moved. See L<<
 perlapi/PL_parser->linestr >> and L<perlapi/lex_next_chunk> for more
 information.
 
+NOTE: This function currently only returns text that is on the current line,
+unless the current line has been fully read (via C<lex_read>). This is due to a
+bug in perl itself, and this restriction will hopefully be lifted in a future
+version of this module, so don't depend on it. See the L</BUGS> section for
+more information.
+
 =head2 lex_read($n)
 
 Moves the current position in the parsing buffer forward by C<$n> characters
@@ -155,10 +166,14 @@ reverse order. See L<perlapi/lex_stuff_sv> for more information.
 parse_fullexpr, parse_listexpr, parse_termexpr, parse_arithexpr
 
 These functions parse the specified amount of Perl code, and return a coderef
-which will evaluate that code when executed. See L<perlapi/parse_block>,
-L<perlapi/parse_stmtseq>, L<perlapi/parse_fullstmt>, L<perlapi/parse_barestmt>,
-L<perlapi/parse_fullexpr>, L<parse_listexpr>, L<parse_termexpr>, and
-L<perlapi/parse_arithexpr> for more details.
+which will evaluate that code when executed. They each take an optional boolean
+parameter that should be true if you are creating a subroutine which will be
+going in the symbol table, or in other more obscure situations involving
+closures (the CVf_ANON flag will be set on the created coderef if this is not
+passed - see C<t/unavailable.t> in this distribution). See
+L<perlapi/parse_block>, L<perlapi/parse_stmtseq>, L<perlapi/parse_fullstmt>,
+L<perlapi/parse_barestmt>, L<perlapi/parse_fullexpr>, L<parse_listexpr>,
+L<parse_termexpr>, and L<perlapi/parse_arithexpr> for more details.
 
 =head2 compiling_package
 
@@ -168,9 +183,21 @@ do something like install a subroutine in the calling package.
 
 =head1 BUGS
 
-This module inherits the limitation from L<Devel::CallParser> that custom
+Peeking into the next line is currently (as of 5.19.2) broken in perl if the
+current line hasn't been fully consumed. This module works around this by just
+not doing that. This shouldn't be an issue for the most part, since it will
+only come up if you need to conditionally parse something based on a token that
+can span multiple lines. Just keep in mind that if you're reading in a large
+chunk of text, you'll need to alternate between calling C<lex_peek> and
+C<lex_read>, or else you'll only be able to see text on the current line.
+
+This module also inherits the limitation from L<Devel::CallParser> that custom
 parsing is only triggered if the keyword is called by its unqualified name
 (C<try>, not C<Try::try>, for instance).
+
+This module doesn't yet work with lexical subs, such as via
+L<Exporter::Lexical>. This will hopefully be fixed in the future, but will
+likely require modifications to perl.
 
 Please report any bugs to GitHub Issues at
 L<https://github.com/doy/parse-keyword/issues>.

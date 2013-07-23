@@ -40,6 +40,7 @@
       },
       "test" : {
          "requires" : {
+            "B::Hooks::EndOfScope" : "0",
             "Carp" : "0",
             "Exporter" : "0",
             "File::Find" : "0",
@@ -61,7 +62,7 @@
          "web" : "https://github.com/doy/parse-keyword"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.018000"

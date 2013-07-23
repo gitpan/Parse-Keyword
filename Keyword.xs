@@ -7,6 +7,10 @@
 #define cv_clone(a) Perl_cv_clone(aTHX_ a)
 #endif
 
+#ifndef scalar
+#define scalar(a) Perl_scalar(aTHX_ a)
+#endif
+
 #define REENTER_PARSER STMT_START {    \
     ENTER;                     \
     PL_curcop = &PL_compiling; \
@@ -15,15 +19,15 @@
 
 #define LEAVE_PARSER LEAVE
 
-static SV *parser_fn(OP *(fn)(U32))
+static SV *parser_fn(OP *(fn)(pTHX_ U32), bool named)
 {
     I32 floor;
     CV *code;
 
     REENTER_PARSER;
 
-    floor = start_subparse(0, CVf_ANON);
-    code = newATTRSUB(floor, NULL, NULL, NULL, fn(0));
+    floor = start_subparse(0, named ? 0 : CVf_ANON);
+    code = newATTRSUB(floor, NULL, NULL, NULL, fn(aTHX_ 0));
 
     LEAVE_PARSER;
 
@@ -41,12 +45,13 @@ static OP *parser_callback(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
     SV *statement = NULL;
     I32 count;
 
-    // call the parser callback
-    // it should take no arguments and return a coderef which, when called,
-    // produces the arguments to the keyword function
-    // the optree we want to generate is for something like
-    //   mykeyword($code->())
-    // where $code is the thing returned by the parser function
+    /* call the parser callback
+     * it should take no arguments and return a coderef which, when called,
+     * produces the arguments to the keyword function
+     * the optree we want to generate is for something like
+     *   mykeyword($code->())
+     * where $code is the thing returned by the parser function
+     */
 
     PUSHMARK(SP);
     count = call_sv(psobj, G_ARRAY);
@@ -67,30 +72,14 @@ static OP *parser_callback(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)
     }
 
     return newUNOP(OP_ENTERSUB, OPf_STACKED,
-                   newCVREF(0,
-                            Perl_scalar(newSVOP(OP_CONST, 0,
-                                                args_generator))));
+                   newCVREF(0, scalar(newSVOP(OP_CONST, 0, args_generator))));
 }
 
-// we will need helper functions for
-// - lexer functions
-//   - lex_read_space
-//   - lex_peek_unichar
-//   - lex_stuff_sv
-// - parser functions (OP* return values should become coderefs)
-//   - parse_arithexpr
-//   - parse_barestmt
-//   - parse_block
-//   - parse_fullexpr
-//   - parse_fullstmt
-//   - parse_label
-//   - parse_listexpr
-//   - parse_stmtseq
-//   - parse_termexpr
-// - random other things
-//   - "read a variable name"
-//   - "read a quoted string"
-//   - "create a new lexical variable" (should return a reference to it)
+/* TODO:
+ *   - "parse a variable name"
+ *   - "parse a quoted string"
+ *   - "create a new lexical variable" (maybe?)
+ */
 
 MODULE = Parse::Keyword  PACKAGE = Parse::Keyword
 
@@ -108,14 +97,29 @@ lex_peek(len = 1)
     UV len
   CODE:
     PL_curcop = &PL_compiling;
+
+    /* XXX before 5.19.2, lex_next_chunk when we aren't at the end of a line
+     * just breaks things entirely (the parser no longer sees the text that is
+     * read in). this is (i think inadvertently) fixed in 5.19.2 (21791330a),
+     * but it still screws up the line numbers of everything that follows. so,
+     * the workaround is just to not call lex_next_chunk unless we're at the
+     * end of a line. this is a bit limiting, but should rarely come up in
+     * practice.
+    */
+    /*
     while (PL_parser->bufend - PL_parser->bufptr < len) {
-        if (!lex_next_chunk(LEX_KEEP_PREVIOUS)) {
+        if (!lex_next_chunk(0)) {
             break;
         }
+    }
+    */
+    if (PL_parser->bufptr == PL_parser->bufend) {
+        lex_next_chunk(0);
     }
     if (PL_parser->bufend - PL_parser->bufptr < len) {
         len = PL_parser->bufend - PL_parser->bufptr;
     }
+
     RETVAL = newSVpvn(PL_parser->bufptr, len); /* XXX unicode? */
   OUTPUT:
     RETVAL
@@ -141,58 +145,66 @@ lex_stuff(str)
     lex_stuff_sv(str, 0);
 
 SV *
-parse_block()
+parse_block(named = FALSE)
+    bool named
   CODE:
-    RETVAL = parser_fn(Perl_parse_block);
+    RETVAL = parser_fn(Perl_parse_block, named);
   OUTPUT:
     RETVAL
 
 SV *
-parse_stmtseq()
+parse_stmtseq(named = FALSE)
+    bool named
   CODE:
-    RETVAL = parser_fn(Perl_parse_stmtseq);
+    RETVAL = parser_fn(Perl_parse_stmtseq, named);
   OUTPUT:
     RETVAL
 
 SV *
-parse_fullstmt()
+parse_fullstmt(named = FALSE)
+    bool named
   CODE:
-    RETVAL = parser_fn(Perl_parse_fullstmt);
+    RETVAL = parser_fn(Perl_parse_fullstmt, named);
   OUTPUT:
     RETVAL
 
 SV *
-parse_barestmt()
+parse_barestmt(named = FALSE)
+    bool named
   CODE:
-    RETVAL = parser_fn(Perl_parse_barestmt);
+    RETVAL = parser_fn(Perl_parse_barestmt, named);
   OUTPUT:
     RETVAL
 
 SV *
-parse_fullexpr()
+parse_fullexpr(named = FALSE)
+    bool named
   CODE:
-    RETVAL = parser_fn(Perl_parse_fullexpr);
+    RETVAL = parser_fn(Perl_parse_fullexpr, named);
   OUTPUT:
     RETVAL
 
 SV *
-parse_listexpr()
+parse_listexpr(named = FALSE)
+    bool named
   CODE:
-    RETVAL = parser_fn(Perl_parse_listexpr);
+    RETVAL = parser_fn(Perl_parse_listexpr, named);
   OUTPUT:
     RETVAL
 
 SV *
-parse_termexpr()
+parse_termexpr(named = FALSE)
+    bool named
   CODE:
-    RETVAL = parser_fn(Perl_parse_termexpr);
+    RETVAL = parser_fn(Perl_parse_termexpr, named);
   OUTPUT:
     RETVAL
 
 SV *
-parse_arithexpr()
+parse_arithexpr(named = FALSE)
+    bool named
   CODE:
-    RETVAL = parser_fn(Perl_parse_arithexpr);
+    RETVAL = parser_fn(Perl_parse_arithexpr, named);
   OUTPUT:
     RETVAL
 

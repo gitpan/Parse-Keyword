@@ -23,6 +23,9 @@ t/fun/recursion.t
 t/fun/slurpy-syntax-errors.t
 t/fun/slurpy.t
 t/fun/state.t
+t/lexical.t
+t/peek.t
+t/scope-inject.t
 t/try/basic.t
 t/try/context.t
 t/try/finally.t
@@ -32,6 +35,7 @@ t/try/lib/Error2.pm
 t/try/lib/Try.pm
 t/try/syntax.t
 t/try/when.t
+t/unavailable.t
 xt/release/eol.t
 xt/release/no-tabs.t
 xt/release/pod-coverage.t

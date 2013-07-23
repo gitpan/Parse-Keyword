@@ -23,19 +23,30 @@ static SV *parser_fn(OP *(fn)(pTHX_ U32), bool named)
 {
     I32 floor;
     CV *code;
+    U8 errors;
 
     REENTER_PARSER;
+    SAVEI8(PL_parser->error_count);
+    PL_parser->error_count = 0;
 
     floor = start_subparse(0, named ? 0 : CVf_ANON);
     code = newATTRSUB(floor, NULL, NULL, NULL, fn(aTHX_ 0));
 
+    errors = PL_parser->error_count;
+
     LEAVE_PARSER;
 
-    if (CvCLONE(code)) {
-        code = cv_clone(code);
+    if (errors) {
+        ++PL_parser->error_count;
+        return newSV(0);
     }
+    else {
+        if (CvCLONE(code)) {
+            code = cv_clone(code);
+        }
 
-    return newRV_inc((SV*)code);
+        return newRV_inc((SV*)code);
+    }
 }
 
 static OP *parser_callback(pTHX_ GV *namegv, SV *psobj, U32 *flagsp)

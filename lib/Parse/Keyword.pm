@@ -3,7 +3,7 @@ BEGIN {
   $Parse::Keyword::AUTHORITY = 'cpan:DOY';
 }
 {
-  $Parse::Keyword::VERSION = '0.02';
+  $Parse::Keyword::VERSION = '0.03';
 }
 use strict;
 use warnings;
@@ -69,7 +69,7 @@ Parse::Keyword - write syntax extensions in perl
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -205,6 +205,8 @@ L<https://github.com/doy/parse-keyword/issues>.
 =head1 SEE ALSO
 
 L<Devel::CallParser>
+
+L<Keyword::API>
 
 L<Devel::Declare>
 

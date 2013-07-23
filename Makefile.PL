@@ -9,7 +9,6 @@ my %WriteMakefileArgs = (
   'ABSTRACT' => 'write syntax extensions in perl',
   'AUTHOR' => 'Jesse Luehrs <doy@tozt.net>',
   'BUILD_REQUIRES' => {
-    'B::Hooks::EndOfScope' => '0',
     'Carp' => '0',
     'Exporter' => '0',
     'File::Find' => '0',
@@ -31,7 +30,7 @@ my %WriteMakefileArgs = (
     'strict' => '0',
     'warnings' => '0'
   },
-  'VERSION' => '0.02',
+  'VERSION' => '0.03',
   'test' => {
     'TESTS' => 't/*.t t/fun/*.t t/try/*.t'
   }

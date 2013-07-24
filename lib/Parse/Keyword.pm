@@ -3,7 +3,7 @@ BEGIN {
   $Parse::Keyword::AUTHORITY = 'cpan:DOY';
 }
 {
-  $Parse::Keyword::VERSION = '0.03';
+  $Parse::Keyword::VERSION = '0.04';
 }
 use strict;
 use warnings;
@@ -69,7 +69,7 @@ Parse::Keyword - write syntax extensions in perl
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -117,11 +117,11 @@ should be used to implement the custom parsing behavior.
 
 The parsing coderefs will be called when perl encounters a call to the keyword
 that you attached custom parsing to. The current parser state will be directly
-after parsing the keyword. Your parser function should return a coderef which,
-when called at runtime, will produce the arguments to the function. In
-addition, if your keyword should be parsed as a statement (for instance, if you
-don't want to require a trailing semicolon), you can return a second, true
-value.
+after parsing the keyword. The parser function will receive the name of the
+keyword as a parameter, and should return a coderef which, when called at
+runtime, will produce the arguments to the function. In addition, if your
+keyword should be parsed as a statement (for instance, if you don't want to
+require a trailing semicolon), you can return a second, true value.
 
 In order to actually handle the parsing itself, this module also exports
 various parsing functions, which you can call. See below for details.

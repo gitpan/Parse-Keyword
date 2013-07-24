@@ -25,6 +25,7 @@ t/fun/recursion.t
 t/fun/slurpy-syntax-errors.t
 t/fun/slurpy.t
 t/fun/state.t
+t/keyword-name.t
 t/lexical.t
 t/lib/My/Parser.pm
 t/peek.t

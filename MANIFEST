@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+callparser1.h
 dist.ini
 inc/MakeMaker.pm
 lib/Parse/Keyword.pm

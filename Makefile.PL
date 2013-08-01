@@ -24,13 +24,17 @@ my %WriteMakefileArgs = (
   'EXE_FILES' => [],
   'LICENSE' => 'mit',
   'NAME' => 'Parse::Keyword',
+  'NORECURS' => 1,
   'PREREQ_PM' => {
     'Devel::CallParser' => '0',
     'XSLoader' => '0',
     'strict' => '0',
     'warnings' => '0'
   },
-  'VERSION' => '0.05',
+  'VERSION' => '0.06',
+  'clean' => {
+    'FILES' => 'callparser1.h'
+  },
   'test' => {
     'TESTS' => 't/*.t t/fun/*.t t/try/*.t'
   }
@@ -53,8 +57,13 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
-WriteMakefile(%WriteMakefileArgs);
-
-use Devel::CallParser 'callparser1_h';
+use File::Spec::Functions 'abs2rel';
+use Devel::CallParser 'callparser1_h', 'callparser_linkable';
 open my $fh, '>', 'callparser1.h' or die "Couldn't write to callparser1.h";
 $fh->print(callparser1_h);
+my @linkable = map { abs2rel($_) } callparser_linkable;
+unshift @linkable, '$(BASEEXT)$(OBJ_EXT)' if @linkable;
+$WriteMakefileArgs{OBJECT} = join(' ', @linkable) if @linkable;
+
+WriteMakefile(%WriteMakefileArgs);
+

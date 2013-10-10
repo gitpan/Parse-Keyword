@@ -12,6 +12,7 @@ inc/MakeMaker.pm
 lib/Parse/Keyword.pm
 t/00-compile.t
 t/basic.t
+t/closure.t
 t/error.pl
 t/error.t
 t/fun/anon.t

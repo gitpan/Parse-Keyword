@@ -3,12 +3,12 @@ BEGIN {
   $Parse::Keyword::AUTHORITY = 'cpan:DOY';
 }
 {
-  $Parse::Keyword::VERSION = '0.06';
+  $Parse::Keyword::VERSION = '0.07';
 }
 use strict;
 use warnings;
 use 5.014;
-# ABSTRACT: write syntax extensions in perl
+# ABSTRACT: DEPRECATED: write syntax extensions in perl
 
 use Devel::CallParser;
 use XSLoader;
@@ -65,11 +65,11 @@ __END__
 
 =head1 NAME
 
-Parse::Keyword - write syntax extensions in perl
+Parse::Keyword - DEPRECATED: write syntax extensions in perl
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -180,6 +180,16 @@ L<parse_termexpr>, and L<perlapi/parse_arithexpr> for more details.
 Returns the name of the package that the keyword which is currently being
 parsed was called in. This should be used instead of C<caller> if you want to
 do something like install a subroutine in the calling package.
+
+=head1 DO NOT USE!
+
+This module has fundamental errors in the way it handles closures, which are
+not fixable. Runtime keywords will never be able to work properly with the
+current design of this module. There are certain cases where this module is
+still safe to use (keywords that only have effect at compile time, or keywords
+that never call any of the C<parse_*> functions), but that is limiting enough
+to make this module mostly worthless, and I likely won't be continuing to
+maintain it. Be warned!
 
 =head1 BUGS
 

@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Parse-Keyword,
-version 0.06:
+version 0.07:
 
-  write syntax extensions in perl
+  DEPRECATED: write syntax extensions in perl
 
 This software is Copyright (c) 2013 by Jesse Luehrs.
 

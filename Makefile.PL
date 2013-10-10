@@ -6,7 +6,7 @@ use warnings;
 use ExtUtils::MakeMaker 6.30;
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'write syntax extensions in perl',
+  'ABSTRACT' => 'DEPRECATED: write syntax extensions in perl',
   'AUTHOR' => 'Jesse Luehrs <doy@tozt.net>',
   'BUILD_REQUIRES' => {
     'Carp' => '0',
@@ -14,7 +14,9 @@ my %WriteMakefileArgs = (
     'File::Find' => '0',
     'File::Temp' => '0',
     'Test::More' => '0.88',
-    'if' => '0'
+    'base' => '0',
+    'if' => '0',
+    'lib' => '0'
   },
   'CONFIGURE_REQUIRES' => {
     'Devel::CallParser' => '0',
@@ -31,7 +33,7 @@ my %WriteMakefileArgs = (
     'strict' => '0',
     'warnings' => '0'
   },
-  'VERSION' => '0.06',
+  'VERSION' => '0.07',
   'clean' => {
     'FILES' => 'callparser1.h'
   },

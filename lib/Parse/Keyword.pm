@@ -3,7 +3,7 @@ BEGIN {
   $Parse::Keyword::AUTHORITY = 'cpan:DOY';
 }
 {
-  $Parse::Keyword::VERSION = '0.07';
+  $Parse::Keyword::VERSION = '0.08';
 }
 use strict;
 use warnings;
@@ -69,7 +69,7 @@ Parse::Keyword - DEPRECATED: write syntax extensions in perl
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -100,6 +100,16 @@ version 0.07
   }
 
 =head1 DESCRIPTION
+
+=head2 DO NOT USE!
+
+This module has fundamental errors in the way it handles closures, which are
+not fixable. Runtime keywords will never be able to work properly with the
+current design of this module. There are certain cases where this module is
+still safe to use (keywords that only have effect at compile time, or keywords
+that never call any of the C<parse_*> functions), but that is limiting enough
+to make this module mostly worthless, and I likely won't be continuing to
+maintain it. Be warned!
 
 B<< NOTE: The API of this module is still in flux. I may make
 backwards-incompatible changes as I figure out how it should look. >>
@@ -180,16 +190,6 @@ L<parse_termexpr>, and L<perlapi/parse_arithexpr> for more details.
 Returns the name of the package that the keyword which is currently being
 parsed was called in. This should be used instead of C<caller> if you want to
 do something like install a subroutine in the calling package.
-
-=head1 DO NOT USE!
-
-This module has fundamental errors in the way it handles closures, which are
-not fixable. Runtime keywords will never be able to work properly with the
-current design of this module. There are certain cases where this module is
-still safe to use (keywords that only have effect at compile time, or keywords
-that never call any of the C<parse_*> functions), but that is limiting enough
-to make this module mostly worthless, and I likely won't be continuing to
-maintain it. Be warned!
 
 =head1 BUGS
 

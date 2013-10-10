@@ -24,7 +24,7 @@ name: Parse-Keyword
 provides:
   Parse::Keyword:
     file: lib/Parse/Keyword.pm
-    version: 0.07
+    version: 0.08
 requires:
   Devel::CallParser: 0
   XSLoader: 0
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/doy/parse-keyword/issues
   homepage: http://metacpan.org/release/Parse-Keyword
   repository: git://github.com/doy/parse-keyword.git
-version: 0.07
+version: 0.08
 x_Dist_Zilla:
   perl:
     version: 5.018001
